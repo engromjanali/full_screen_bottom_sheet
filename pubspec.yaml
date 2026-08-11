@@ -1,9 +1,14 @@
 name: full_screen_bottom_sheet
 description: A draggable bottom sheet that becomes a full-screen page, with a header that adapts between sheet and app-bar presentation.
 version: 1.0.0
-publish_to: 'none'
 repository: https://github.com/engromjanali/full_screen_bottom_sheet
 issue_tracker: https://github.com/engromjanali/full_screen_bottom_sheet/issues
+
+topics:
+  - bottom-sheet
+  - ui
+  - widgets
+  - navigation
 
 environment:
   sdk: '>=3.5.0 <4.0.0'
@@ -17,5 +22,3 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
-
-flutter:
