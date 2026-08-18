@@ -93,8 +93,18 @@ class FullScreenBottomSheet extends StatefulWidget {
   /// Background behind the sheet's content. Defaults to the theme's surface.
   final Color? backgroundColor;
 
-  /// Corner rounding of the sheet. Defaults to a 16px top-only radius.
+  /// Corner rounding of the sheet while it is below full screen.
+  ///
+  /// Defaults to a 16px top-only radius.
   final BorderRadiusGeometry? borderRadius;
+
+  /// Corner rounding the sheet reaches once it covers the top safe area.
+  ///
+  /// The sheet interpolates from [borderRadius] to this as it slides through
+  /// the status bar, so a full-screen sheet reads as a page rather than a sheet
+  /// with rounded corners cut off by the screen edge. Defaults to square
+  /// corners; pass the same value as [borderRadius] to keep the rounding.
+  final BorderRadiusGeometry? fullScreenBorderRadius;
 
   /// Scroll physics for the sheet's scroll view.
   final ScrollPhysics? physics;
@@ -126,6 +136,7 @@ class FullScreenBottomSheet extends StatefulWidget {
     this.snapSizes,
     this.backgroundColor,
     this.borderRadius,
+    this.fullScreenBorderRadius,
     this.physics,
     this.controller,
     this.onMetricsChanged,
@@ -178,6 +189,8 @@ class FullScreenBottomSheet extends StatefulWidget {
 }
 
 class _FullScreenBottomSheetState extends State<FullScreenBottomSheet> {
+  static const BorderRadius _defaultBorderRadius = BorderRadius.vertical(top: Radius.circular(16));
+
   DraggableScrollableController? _internalController;
   late final ValueNotifier<FullScreenBottomSheetMetrics> _metrics;
   double _footerHeight = 0;
@@ -229,6 +242,16 @@ class _FullScreenBottomSheetState extends State<FullScreenBottomSheet> {
     }
   }
 
+  /// Rounding for [metrics], interpolated between the sheet and full-screen
+  /// shapes across the top safe area.
+  BorderRadius _borderRadiusFor(FullScreenBottomSheetMetrics metrics) {
+    final TextDirection direction = Directionality.of(context);
+    final BorderRadius sheetShape = (widget.borderRadius ?? _defaultBorderRadius).resolve(direction);
+    final BorderRadius pageShape = (widget.fullScreenBorderRadius ?? BorderRadius.zero).resolve(direction);
+    if (sheetShape == pageShape) return sheetShape;
+    return BorderRadius.lerp(sheetShape, pageShape, metrics.safeAreaProgress)!;
+  }
+
   void _handleFooterHeight(double height) {
     if (height == _footerHeight) return;
     setState(() => _footerHeight = height);
@@ -236,8 +259,6 @@ class _FullScreenBottomSheetState extends State<FullScreenBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final BorderRadiusGeometry borderRadius =
-        widget.borderRadius ?? const BorderRadius.vertical(top: Radius.circular(16));
     final Color background = widget.backgroundColor ?? Theme.of(context).colorScheme.surface;
 
     return NotificationListener<DraggableScrollableNotification>(
@@ -262,8 +283,14 @@ class _FullScreenBottomSheetState extends State<FullScreenBottomSheet> {
 
           return FullScreenBottomSheetScope(
             metrics: _metrics,
-            child: ClipRRect(
-              borderRadius: borderRadius.resolve(Directionality.of(context)),
+            // Only the clip follows the extent frame by frame; the content is
+            // passed through untouched so dragging never rebuilds it.
+            child: ValueListenableBuilder<FullScreenBottomSheetMetrics>(
+              valueListenable: _metrics,
+              builder: (context, liveMetrics, child) => ClipRRect(
+                borderRadius: _borderRadiusFor(liveMetrics.screenSize.isEmpty ? metrics : liveMetrics),
+                child: child,
+              ),
               child: ColoredBox(
                 color: background,
                 child: Stack(children: [

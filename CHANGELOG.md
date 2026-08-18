@@ -1,3 +1,10 @@
+## 1.1.0
+
+- The sheet now flattens its top corners as it slides through the top safe area,
+  so a full-screen sheet reads as a page instead of a sheet with rounded corners
+  against the screen edge. Set `fullScreenBorderRadius` to the same value as
+  `borderRadius` to keep the previous behaviour.
+
 ## 1.0.0
 
 - Initial release.
