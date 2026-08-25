@@ -12,6 +12,8 @@ button, so an expanded sheet reads as a screen rather than a sheet.
 The package depends only on Flutter, so it carries no opinion about state
 management or navigation.
 
+![A bottom sheet dragged up until it becomes a full-screen page, its header turning into an app bar](https://raw.githubusercontent.com/engromjanali/full_screen_bottom_sheet/main/screenshots/full-screen-transition.gif)
+
 ## Usage
 
 ```dart
@@ -52,6 +54,8 @@ For a single box-model child, pass `child:` instead of `slivers:`.
   top padding so content clears the notch exactly when it needs to.
 - `expansion` — progress between `minExtent` and `maxExtent`.
 - `safeAreaProgress` — progress moving into the safe area, for cross-fades.
+
+![The sheet's metrics updating on every frame of a drag](https://raw.githubusercontent.com/engromjanali/full_screen_bottom_sheet/main/screenshots/live-metrics.gif)
 
 `headerBuilder` and `footerBuilder` rebuild only when the header's appearance
 actually changes, so dragging never rebuilds the sheet's content. Override

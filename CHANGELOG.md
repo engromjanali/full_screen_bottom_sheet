@@ -1,3 +1,8 @@
+## 1.1.1
+
+- Added demo recordings to the README: the sheet expanding into a full-screen
+  page, and the metrics updating as it is dragged. No code changes.
+
 ## 1.1.0
 
 - The sheet now flattens its top corners as it slides through the top safe area,
